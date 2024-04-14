@@ -258,7 +258,7 @@ const SnapMixin = {
     this.debugIndicatorLines = debugIndicatorLines;
   },
   _handleSnapLayerRemoval({ layer }) {
-    if (!layer._leaflet_id || !this._snapList) {
+    if (!layer._leaflet_id) {
       return;
     }
     // find the layers index in snaplist
