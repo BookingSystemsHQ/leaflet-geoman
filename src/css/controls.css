@@ -24,13 +24,15 @@
 .leaflet-pm-toolbar
   .button-container:last-child
   a.leaflet-buttons-control-button {
-  border-radius: 0 0 2px 2px;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
 }
 
 .leaflet-pm-toolbar
   .button-container:first-child
   a.leaflet-buttons-control-button {
-  border-radius: 2px 2px 0 0;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
 }
 
 .leaflet-pm-toolbar
@@ -159,6 +161,7 @@
   border-bottom: none;
   height: 29px;
   line-height: 29px;
+  vertical-align: middle;
 }
 .leaflet-pm-toolbar
   .button-container:first-child.pos-right.active
@@ -177,6 +180,11 @@
   background-color: #777;
 }
 
+.button-container
+  .leaflet-pm-actions-container
+  .leaflet-pm-action.active-action {
+  background-color: #8e8e8e;
+}
 /* That the active control is always over the other controls */
 .leaflet-pm-toolbar.activeChild {
   z-index: 801;
@@ -188,4 +196,11 @@
 
 .leaflet-buttons-control-button.pm-disabled > .control-icon {
   filter: opacity(0.6);
+}
+
+.button-container
+  .leaflet-pm-actions-container
+  .pm-action-button-mode.control-icon {
+  filter: brightness(0) invert(1);
+  width: 18px;
 }

@@ -81,7 +81,7 @@ describe('Text Layer', () => {
         expect(textArea.value).to.eq('Hello World');
       });
 
-      cy.get(mapSelector).click(190, 250);
+      cy.get(mapSelector).click(230, 250);
 
       cy.window().then(() => {
         expect(textArea.readOnly).to.eq(true);
@@ -107,6 +107,31 @@ describe('Text Layer', () => {
 
       cy.wait(500);
       cy.get(mapSelector).click(190, 250);
+      cy.wait(500);
+
+      cy.window().then(({ map }) => {
+        expect(0).to.eq(map.pm.getGeomanDrawLayers().length);
+      });
+    });
+
+    it('place text layer and remove it with click on control', () => {
+      cy.toolbarButton('text')
+        .click()
+        .closest('.button-container')
+        .should('have.class', 'active');
+
+      cy.get(mapSelector).click(90, 250);
+
+      let textArea;
+      cy.window().then(({ map }) => {
+        expect(1).to.eq(map.pm.getGeomanDrawLayers().length);
+        const textLayer = map.pm.getGeomanDrawLayers()[0];
+        textArea = textLayer.pm.getElement();
+        expect(textArea.value).to.eq('');
+      });
+
+      cy.wait(500);
+      cy.get(mapSelector).click(20, 20);
       cy.wait(500);
 
       cy.window().then(({ map }) => {
@@ -147,6 +172,19 @@ describe('Text Layer', () => {
         const textLayer = map.pm.getGeomanDrawLayers()[1];
         textArea = textLayer.pm.getElement();
         cy.get(textArea).type('Geoman!');
+
+        const textMap = map.pm.Draw.Text._hintMarker._map;
+        expect(textMap).to.eq(null);
+      });
+
+      cy.get(mapSelector).trigger('mousemove', 200, 150, { which: 1 });
+
+      cy.window().then(({ map }) => {
+        const textMap = map.pm.Draw.Text._hintMarker._map;
+        expect(textMap).to.eq(map);
+        const latlng = map.pm.Draw.Text._hintMarker.getLatLng();
+        const pxLatLng = map.containerPointToLatLng([200, 150]);
+        expect(pxLatLng).to.deep.equal(latlng);
       });
 
       cy.get(mapSelector).click(290, 150);
@@ -181,7 +219,7 @@ describe('Text Layer', () => {
         expect(textArea.value).to.eq('Hello World');
       });
 
-      cy.get(mapSelector).click(190, 250);
+      cy.get(mapSelector).click(230, 250);
 
       cy.window().then(() => {
         expect(textArea.readOnly).to.eq(true);
@@ -211,6 +249,44 @@ describe('Text Layer', () => {
         expect(textArea.style.height).to.eq('21px');
         // exact width can't be checked because if the test is running on Github, it has a different width.
         expect(textArea.style.width !== '1px').to.eq(true);
+      });
+    });
+
+    it('allows to edit the Text multiple times', () => {
+      cy.toolbarButton('text')
+        .click()
+        .closest('.button-container')
+        .should('have.class', 'active');
+
+      cy.get(mapSelector).click(90, 250);
+
+      let textArea;
+      cy.window().then(({ map }) => {
+        expect(1).to.eq(map.pm.getGeomanDrawLayers().length);
+        const textLayer = map.pm.getGeomanDrawLayers()[0];
+        textArea = textLayer.pm.getElement();
+        expect(textArea.style.width).to.eq('16px');
+        cy.get(textArea).type('Hello World');
+      });
+      cy.get(mapSelector).click(100, 100);
+
+      cy.toolbarButton('edit').click();
+
+      cy.get(mapSelector).click(90, 250);
+      cy.window().then(() => {
+        expect(textArea.value).to.eq('Hello World');
+        cy.get(textArea).type(' - Hello Test');
+      });
+      cy.get(mapSelector).click(100, 100);
+      cy.get(mapSelector).click(90, 250);
+      cy.window().then(() => {
+        expect(textArea.value).to.eq('Hello World - Hello Test');
+        cy.get(textArea).type(' - Bye');
+      });
+      cy.get(mapSelector).click(100, 100);
+      cy.get(mapSelector).click(90, 250);
+      cy.window().then(() => {
+        expect(textArea.value).to.eq('Hello World - Hello Test - Bye');
       });
     });
 

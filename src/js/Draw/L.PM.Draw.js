@@ -28,12 +28,19 @@ const Draw = L.Class.extend({
     minRadiusCircleMarker: null,
     maxRadiusCircleMarker: null,
     resizeableCircleMarker: false,
-    resizableCircle: true,
+    resizeableCircle: true,
     markerEditable: true,
     continueDrawing: false,
     snapSegment: true,
     requireSnapToFinish: false,
     rectangleAngle: 0,
+    textOptions: {
+      text: null,
+      focusAfterDraw: null,
+      removeIfEmpty: null,
+      className: null,
+    },
+    snapVertex: true,
   },
   setOptions(options) {
     L.Util.setOptions(this, options);
