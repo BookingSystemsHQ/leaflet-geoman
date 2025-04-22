@@ -49,16 +49,16 @@
     "leaflet": "^1.2.0"
   },
   "scripts": {
-    "start": "pnpm run dev",
+    "start": "npm run dev",
     "dev": "cross-env DEV=true ts-node bundle.mjs",
     "build": "ts-node bundle.mjs",
     "test": "cypress run --browser chrome",
     "cypress": "cypress open",
-    "prepare": "pnpm run build && husky",
+    "prepare": "npm run build && husky",
     "eslint-check": "eslint --print-config . | eslint-config-prettier-check",
     "eslint": "eslint \"{src,demo}/**/*.js\" --fix ",
     "prettier": "prettier --write \"{src,demo}/**/*.{js,css}\" --log-level=warn",
-    "lint": "pnpm run eslint && pnpm run prettier"
+    "lint": "npm run eslint && npm run prettier"
   },
   "repository": {
     "type": "git",
