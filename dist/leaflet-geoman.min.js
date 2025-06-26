@@ -5426,6 +5426,10 @@
         for (let e in t) t[e].remove();
         this.isVisible = !1;
       },
+      deleteControl(t) {
+        let e = this._btnNameMapping(t);
+        this.buttons[e] && (this.buttons[e].remove(), delete this.buttons[e]);
+      },
       toggleControls(t = this.options) {
         this.isVisible ? this.removeControls() : this.addControls(t);
       },
@@ -6325,7 +6329,8 @@
     initialize(t) {
       (this._map = t),
         (this._shape = 'Marker'),
-        (this.toolbarButtonName = 'drawMarker');
+        (this.toolbarButtonName = 'drawMarker'),
+        (this._layerIsDragging = !1);
     },
     enable(t) {
       L.Util.setOptions(this, t),
@@ -6397,6 +6402,7 @@
     _createMarker(t) {
       if (
         !t.latlng ||
+        this._layerIsDragging ||
         (this.options.requireSnapToFinish &&
           !this._hintMarker._snapped &&
           !this._isFirstLayer())
@@ -11932,6 +11938,8 @@
         this.applyOptions(),
         this._layer.on('remove', this.disable, this),
         (this._enabled = !0),
+        this._layer.on('pm:dragstart', this._onDragStart, this),
+        this._layer.on('pm:dragend', this._onMarkerDragEnd, this),
         this._fireEnable();
     },
     disable() {
@@ -11963,6 +11971,12 @@
     _removeMarker(t) {
       let e = t.target;
       e.remove(), this._fireRemove(e), this._fireRemove(this._map, e);
+    },
+    _onDragStart() {
+      this._map.pm.Draw.Marker._layerIsDragging = !0;
+    },
+    _onMarkerDragEnd() {
+      this._map.pm.Draw.Marker._layerIsDragging = !1;
     },
     _onDragEnd() {
       this._fireEdit(), (this._layerEdited = !0);
@@ -12379,9 +12393,9 @@
           indexPath: r,
           index: n,
           parentPath: s,
-        } = L.PM.Utils.findDeepMarkerIndex(this._markers, t);
-      (r.length > 1 ? (0, Et.default)(e, s) : e).splice(n, 1, i),
-        this._layer.setLatLngs(e);
+        } = L.PM.Utils.findDeepMarkerIndex(this._markers, t),
+        a = r.length > 1 ? (0, Et.default)(e, s) : e;
+      (i.alt = a[n].alt), a.splice(n, 1, i), this._layer.setLatLngs(e);
     },
     _getNeighborMarkers(t) {
       let {
@@ -12414,7 +12428,8 @@
     _onMarkerDragStart(t) {
       let e = t.target;
       if (
-        (this.cachedColor || (this.cachedColor = this._layer.options.color),
+        (this._preventRenderingMarkers(!0),
+        this.cachedColor || (this.cachedColor = this._layer.options.color),
         !this._vertexValidation('move', t))
       )
         return;
@@ -12469,7 +12484,10 @@
     },
     _onMarkerDragEnd(t) {
       let e = t.target;
-      if (!this._vertexValidationDragEnd(e)) return;
+      if (
+        (this._preventRenderingMarkers(!1), !this._vertexValidationDragEnd(e))
+      )
+        return;
       let { indexPath: i } = L.PM.Utils.findDeepMarkerIndex(this._markers, e),
         r = !this.options.allowSelfIntersection && this.hasSelfIntersection();
       r &&
